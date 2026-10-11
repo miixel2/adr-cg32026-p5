@@ -3,6 +3,6 @@
  * Fill these values after running supabase/leaderboard.sql and enabling Anonymous Sign-Ins.
  */
 window.QUIZ_CONFIG = {
-  supabaseUrl: '',
-  supabaseAnonKey: ''
+  supabaseUrl: 'https://wvyilmmaobuzzoyfkvue.supabase.co',
+  supabaseAnonKey: 'sb_publishable_21bG_9Zbbbxlcn0KZAvhmg_Pq9LaDJy'
 };
