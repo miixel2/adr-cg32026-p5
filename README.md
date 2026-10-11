@@ -105,6 +105,82 @@ Settings → Pages → Deploy from a branch → main → /(root) → Save
 - `feedback.html` / `feedback-admin.js`: หน้าจัดการเฉพาะผู้ดูแล ไม่มีลิงก์จากหน้าแรก
 - `supabase/feedback.sql`: migration ของฐานข้อมูลและสิทธิ์
 
+## 📊 คะแนนเฉลี่ยและเปอร์เซ็นไทล์ใน Leaderboard
+
+- 🗃️ รัน [supabase/leaderboard-stats.sql](supabase/leaderboard-stats.sql) ใน Supabase SQL Editor หลัง `leaderboard.sql` เพื่อเปิดกราฟสถิติ ไม่ต้องเปลี่ยน public API key รันซ้ำได้โดยไม่ลบคะแนน
+- 📊 กราฟเปรียบเทียบค่าเฉลี่ยของทุกคนกับคะแนนดีที่สุดที่ผู้ใช้ปัจจุบันแชร์ แยกตามชุดข้อสอบ ใช้เปอร์เซ็นต์คะแนนเพื่อเปรียบเทียบชุดที่จำนวนข้อไม่เท่ากัน และระบุจำนวนผู้ร่วมทุกชุด
+- 🧮 ค่าเฉลี่ยคำนวณจาก **ทุกคะแนนที่แชร์** ไม่ใช่เพียง 15 อันดับแรก แต่ละคนมีคะแนนดีที่สุดหนึ่งรายการต่อชุด เปอร์เซ็นไทล์ = จำนวนคนที่คะแนนเป็นเปอร์เซ็นต์ต่ำกว่าคุณ ÷ จำนวนผู้ร่วมชุดทั้งหมด × 100 คะแนนเท่ากันไม่นับว่าต่ำกว่า แสดงเมื่อมีอย่างน้อย 5 คนเท่านั้น
+- 👤 คะแนนของคุณอ้างอิง session ผู้เล่นเดิม ไม่สร้างบัญชีหรือส่งผลสอบในเครื่องเพียงเพื่อเปิดกราฟ หากยังไม่แชร์ชุดนั้น จะแสดงเฉพาะค่าเฉลี่ย ถ้าล้างข้อมูล Browser หรือเปลี่ยนเครื่องจะไม่สามารถระบุคะแนนของ anonymous account เดิมได้
+- 📝 ชุดจำลองรวมหลายหัวข้อแสดงคะแนนรวมของชุด ยังไม่มีข้อมูลคะแนนแยกรายวิชาของชุดจำลองในฐานข้อมูล สถิติเป็นของผู้สมัครใจแชร์ ไม่ใช่ตัวแทนผู้สอบทั้งหมดหรือผลสอบจริง
+- 🧪 [supabase/tests/leaderboard-stats.sql](supabase/tests/leaderboard-stats.sql) ตรวจค่าเฉลี่ย คะแนนเท่ากัน กลุ่มตัวอย่างน้อย และสิทธิ์แบบ rollback ควรรันผ่าน SQL Editor ทั้งไฟล์โดยไม่แยก statement ออกจาก transaction
+
+## 📧 แจ้งเตือนผู้ดูแลเมื่อมีรายงานใหม่
+
+- ⏸️ **ปิดการส่งอีเมลเป็นค่าเริ่มต้น** เปิดภายหลังได้ด้วย Supabase Edge Function secret `FEEDBACK_EMAIL_ENABLED=true`; ปิดด้วย `false` หรือลบ secret นี้ ต้องใช้ค่า `true` ตัวพิมพ์เล็กตรงตัว ไม่ใช้ `config.js` ฝั่ง Browser
+- 🛠️ หาก deploy รุ่นก่อนหน้าที่ไม่มี toggle แล้ว ต้อง deploy `notify-feedback` รุ่นนี้ก่อนจึงจะใช้สวิตช์ได้ การเปิด/ปิดภายหลังเปลี่ยนเฉพาะ secret ได้ ไม่ต้องแก้หน้าเว็บ
+- 📝 ขณะปิด ผู้ใช้ยังส่งความคิดเห็นและผู้ดูแลจัดการได้ตามปกติ หากติดตั้ง migration/webhook แล้ว คิวใหม่ยังคงเป็น `pending` แต่ function ตอบ `disabled` โดยไม่ claim งานหรือเรียกบริการอีเมล เมื่อเปิดอีกครั้งจะส่งเฉพาะ webhook ใหม่ ไม่ส่งคิวเก่าย้อนหลังอัตโนมัติ คิวเก่าส่งซ้ำด้วยวิธีด้านล่างได้เมื่อเปิดแล้ว
+- ✉️ รองรับทั้ง **แนะนำติชมทั่วไป** และ **ขอตรวจทาน/แก้ไขข้อสอบ** ส่งแยกถึงอีเมลที่ยืนยันแล้วของทุกบัญชีใน `feedback_admins` ไม่รับที่อยู่อีเมลผู้รับจาก Browser
+- 🔒 อีเมลมีประเภท รหัสรายงาน ลิงก์หน้าผู้ดูแล และลิงก์ข้อสอบเมื่อเกี่ยวข้อง ข้อความฉบับเต็มและข้อมูลผู้ส่งไม่แนบไปด้วย ผู้ดูแลยังต้องเข้าสู่ระบบเพื่ออ่านรายงาน
+- 🗃️ รัน [supabase/feedback-notifications.sql](supabase/feedback-notifications.sql) หลัง `feedback.sql` สร้างคิวส่วนตัว `feedback_email_notifications` รันซ้ำได้ ไม่มีอีเมลย้อนหลังสำหรับรายงานเก่าหรือบัญชีที่เพิ่งเพิ่มสิทธิ์
+
+### ตั้งค่าครั้งแรก
+
+1. 📮 สร้าง API key ใน Resend และยืนยันโดเมนสำหรับที่อยู่ผู้ส่ง ตาม [Resend domain setup](https://resend.com/docs/dashboard/domains/introduction)
+2. 🔑 ตั้งค่า **Edge Function secrets** ใน Supabase Dashboard โดยไม่ใส่ค่าเหล่านี้ใน `config.js`, HTML หรือ Git:
+
+   | Secret | ค่า |
+   | --- | --- |
+   | `FEEDBACK_EMAIL_ENABLED` | `false` ตอนนี้; เปลี่ยนเป็น `true` เมื่อพร้อมส่งอีเมล |
+   | `RESEND_API_KEY` | API key ของ Resend |
+   | `FEEDBACK_EMAIL_FROM` | เช่น `Quiz P5 <quiz@YOUR-VERIFIED-DOMAIN>` |
+   | `FEEDBACK_WEBHOOK_SECRET` | ค่าสุ่มยาวอย่างน้อย 32 ตัวอักษร ใช้ค่าตรงกันกับ webhook header |
+   | `QUIZ_APP_URL` | `https://miixel2.github.io/adr-cg32026-p5/` |
+
+   `SUPABASE_URL` และ `SUPABASE_SERVICE_ROLE_KEY` เป็นค่า server ที่ Supabase Edge Functions จัดให้ เก็บไว้ฝั่ง server เท่านั้น ดู [คู่มือ secrets](https://supabase.com/docs/guides/functions/secrets)
+
+3. 🚀 หลังติดตั้ง Supabase CLI และเข้าสู่ระบบ ให้ deploy จาก root ของ repo:
+
+   ```sh
+   supabase functions deploy notify-feedback --project-ref wvyilmmaobuzzoyfkvue --no-verify-jwt
+   ```
+
+   [supabase/config.toml](supabase/config.toml) ปิด JWT verification เฉพาะ function นี้ เพราะ Database Webhook ใช้ secret header แทน ตัว handler ตรวจ secret ก่อนอ่านฐานข้อมูลหรือส่งอีเมล
+
+4. 🔗 ใน Supabase Database → Webhooks สร้าง webhook สำหรับตาราง **`public.feedback_email_notifications`**, event **INSERT เท่านั้น**, method **POST**, URL `https://wvyilmmaobuzzoyfkvue.supabase.co/functions/v1/notify-feedback` ใส่ headers `Content-Type: application/json` และ `x-feedback-webhook-secret: YOUR-SECRET` ไม่เลือกตาราง `quiz_feedback` หรือ event UPDATE ดู [Database Webhooks](https://supabase.com/docs/guides/database/webhooks)
+5. ✅ เมื่อพร้อมเปิด ให้ตั้ง `FEEDBACK_EMAIL_ENABLED=true` แล้วส่งความคิดเห็นจริงหนึ่งรายการและแจ้งแก้ไขหนึ่งข้อ ตรวจคิวเป็น `sent` พร้อม `provider_message_id`, ดูรายการส่งใน Resend และตรวจกล่องจดหมายผู้ดูแล `sent` หมายถึง provider รับคำขอแล้ว ไม่ใช่ยืนยันว่าเข้า inbox
+
+```mermaid
+flowchart LR
+    A[ผู้ใช้ส่งความคิดเห็นหรือแจ้งแก้ไข] --> B[บันทึกรายงานและคิวส่วนตัว]
+    B --> C[Database Webhook หลังบันทึก]
+    C --> D[Edge Function ตรวจ secret และสิทธิ์ผู้รับ]
+    D --> E[Resend]
+    E --> F[อีเมลผู้ดูแล]
+    D -->|ส่งไม่สำเร็จ| G[คิว failed รอส่งซ้ำ]
+```
+
+### ตรวจสอบและส่งซ้ำ
+
+- 🔍 ตรวจ `status`, `attempts`, `last_error` ใน Table Editor ของ `feedback_email_notifications` ผู้เล่นและบัญชีผู้ดูแลที่ใช้ public API key อ่านหรือแก้คิวนี้ไม่ได้
+- ⏱️ Webhook ทำงานแบบ asynchronous ความล้มเหลวของบริการอีเมลไม่ย้อนกลับรายงานที่บันทึกแล้ว **ยังไม่มี scheduler ส่งซ้ำอัตโนมัติ** เมื่อ webhook ไม่ถึง function งานอาจค้าง `pending`; worker ที่หยุดกลางทางค้าง `sending` และ claim ใหม่ได้หลัง 2 นาที
+- 🔄 หลังแก้สาเหตุ ให้ผู้ดูแลระบบใช้ Edge Function Test ใน Dashboard เรียก POST พร้อม secret header เดิมและ JSON ด้านล่าง โดยแทนสอง ID จากแถวคิว ไม่ส่ง secret จากหน้าเว็บสาธารณะ:
+
+  ```json
+  {
+    "type": "INSERT",
+    "schema": "public",
+    "table": "feedback_email_notifications",
+    "record": {
+      "feedback_id": "REPLACE-WITH-FEEDBACK-UUID",
+      "admin_user_id": "REPLACE-WITH-ADMIN-UUID"
+    }
+  }
+  ```
+
+- 🛡️ งานที่ส่งแล้วไม่ส่งซ้ำ มี lease ป้องกัน worker ซ้อนกัน และใช้ [Resend idempotency key](https://resend.com/docs/dashboard/emails/idempotency-keys) อายุ 24 ชั่วโมง หาก provider รับอีเมลแล้วแต่ฐานข้อมูลบันทึกผลไม่ได้ ให้ตรวจ Resend ก่อน retry หลัง 24 ชั่วโมงเพราะอาจเกิดอีเมลซ้ำได้ ไม่เปลี่ยน sender หรือ URL ระหว่าง retry ของงานเดียวกัน
+- 👤 ทุกครั้งที่ claim จะตรวจ allowlist และอีเมลยืนยันอีกครั้ง การถอนสิทธิ์ลบคิวของบัญชีนั้น หากเปลี่ยนอีเมล งานเดิมจะไม่ส่งไปที่อยู่เก่า ให้ตรวจคิวก่อนส่งใหม่ อีเมลที่ส่งไปแล้วเรียกคืนไม่ได้
+- 🧪 ทดสอบ handler แบบ mock ไม่ส่งอีเมลจริง: `node --test supabase/functions/notify-feedback/handler.test.mjs` และตรวจ SQL แบบ rollback ด้วย [feedback-notifications-security.sql](supabase/tests/feedback-notifications-security.sql)
+
 ## 📖 ส่งให้ผู้ตรวจทาน
 
 - 🔗 เปิด `https://miixel2.github.io/adr-cg32026-p5/review.html` เพื่อดูโจทย์ ตัวเลือก เฉลย คำอธิบาย และกราฟ ครบทุกข้อโดยไม่ต้องทำข้อสอบหรือเข้าสู่ระบบ

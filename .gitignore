@@ -1,0 +1,6 @@
+# Server credentials and local Supabase state must not enter the public repo.
+.env
+.env.*
+!.env.example
+supabase/.temp/
+supabase/.branches/

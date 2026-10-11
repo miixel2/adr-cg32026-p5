@@ -22,7 +22,7 @@ function boardMarkup(){
  '<p class="lb-muted">อันดับแยกตามชุดข้อสอบ • คะแนนสูงสุดจากผู้ร่วมสนุก (ไม่ใช่ผลสอบจริง)</p>'+
  '<div class="lb-controls"><label for="lb-pack">เลือกชุดข้อสอบ:</label><select id="lb-pack" class="lb-select">'+packOptions()+'</select>'+
  '<button type="button" class="btn secondary sm" id="lb-refresh">🔄 อัปเดตอันดับ</button></div>'+
- '<div id="lb-status" role="status" class="lb-muted"></div><div class="lb-wrap" id="lb-results"></div></div>';
+ '<div id="lb-status" role="status" class="lb-muted"></div><div class="lb-wrap" id="lb-results"></div><div id="lb-stats"></div></div>';
 }
 function resultMarkup(){
  return '<div class="leaderboard-panel" id="leaderboard-result">'+
@@ -35,7 +35,27 @@ function resultMarkup(){
  '<button class="btn" id="lb-save" type="button">🌟 ยืนยันบันทึกลง Leaderboard</button></div>'+
  '<div id="lb-save-status" class="lb-msg" role="status"></div></div>'+
  '<div class="lb-controls"><h2 id="lb-result-board" class="lb-board-title" tabindex="-1">อันดับของชุดนี้</h2><button type="button" class="btn secondary sm" id="lb-result-refresh">🔄 ดูอันดับล่าสุด</button></div>'+
- '<div id="lb-result-status" role="status" class="lb-muted"></div><div class="lb-wrap" id="lb-result-rows"></div></div>';
+ '<div id="lb-result-status" role="status" class="lb-muted"></div><div class="lb-wrap" id="lb-result-rows"></div><div id="lb-result-stats"></div></div>';
+}
+function formatStatistics(rows,selected){
+ var data=Array.isArray(rows)?rows:[];
+ var percentage=function(value){return Math.min(100,Math.max(0,Number(value)||0))};
+ var html='<section class="lb-chart" aria-label="เปรียบเทียบคะแนนรายชุด"><h3>แต่ละชุดเป็นอย่างไรบ้าง?</h3>'+
+ '<p class="lb-muted">คะแนนเฉลี่ยและคะแนนดีที่สุดที่แชร์ • เทียบเป็นเปอร์เซ็นต์เพื่อให้ชุดที่จำนวนข้อต่างกันอ่านร่วมกันได้</p>'+
+ '<div class="lb-chart-legend"><span><i class="lb-swatch"></i>ค่าเฉลี่ยทุกคน</span><span><i class="lb-swatch lb-swatch-mine"></i>คะแนนของคุณ</span></div>';
+ PACKS.filter(function(p){return p.id!=='retry'}).forEach(function(pack){
+  var row=data.find(function(r){return r.pack_id===pack.id});
+  if(!row)return;
+  var count=Number(row.participants)||0,avg=percentage(row.average_pct),mine=row.my_pct==null?null:percentage(row.my_pct);
+  html+='<div class="lb-chart-row'+(pack.id===selected?' is-selected':'')+'"><div class="lb-chart-label"><strong>'+esc(pack.title)+'</strong><span>'+count+' คน</span></div>';
+  if(!count){html+='<p class="lb-muted">ยังไม่มีคะแนนที่แชร์</p></div>';return}
+  html+='<div class="lb-bar-line"><span>เฉลี่ย</span><div class="lb-track" aria-hidden="true"><div class="lb-bar" style="width:'+avg+'%"></div></div><strong>'+avg.toFixed(1)+'%</strong></div>';
+  if(mine!==null)html+='<div class="lb-bar-line"><span>คุณ</span><div class="lb-track" aria-hidden="true"><div class="lb-bar lb-bar-mine" style="width:'+mine+'%"></div></div><strong>'+mine.toFixed(1)+'%</strong></div>'+
+   '<p class="lb-percentile">'+(row.percentile==null?'รออย่างน้อย 5 คนเพื่อแสดงเปอร์เซ็นไทล์':'เปอร์เซ็นไทล์ '+percentage(row.percentile).toFixed(1)+' • คะแนนสูงกว่า '+percentage(row.percentile).toFixed(1)+'% ของผู้ร่วมชุดนี้')+'</p>';
+  else html+='<p class="lb-muted">แชร์คะแนนชุดนี้เพื่อดูตำแหน่งของคุณ</p>';
+  html+='</div>';
+ });
+ return html+'<p class="lb-muted lb-chart-note">ใช้คะแนนดีที่สุด 1 รายการต่อคนต่อชุด เฉพาะผู้ที่สมัครใจแชร์ • คะแนนเท่ากันไม่นับว่าต่ำกว่าคุณ • ชุดจำลองรวมหลายหัวข้อ ไม่ใช่คะแนนรายวิชา • ตัวอย่างน้อยอาจเปลี่ยนมากเมื่อมีคนเพิ่ม</p></section>';
 }
 function status(el,message){var node=document.getElementById(el);if(node)node.textContent=message||''}
 function jumpToBoard(id){
@@ -56,6 +76,8 @@ function formatRanks(rows){
 }
 async function updateBoard(packId,rowsId,statusId){
  var token=++boardToken;
+ var chart=document.getElementById(rowsId==='lb-results'?'lb-stats':'lb-result-stats');
+ if(chart)chart.innerHTML='';
  if(!ready()){
   status(statusId,'⏳ ระบบ Leaderboard ยังไม่เปิดใช้งาน โปรดตั้งค่า Supabase ตาม README (ข้อสอบยังทำได้ปกติ)');
   var el=document.getElementById(rowsId);if(el)el.innerHTML='';
@@ -69,7 +91,19 @@ async function updateBoard(packId,rowsId,statusId){
   if(token!==boardToken)return;
   var el=document.getElementById(rowsId);if(el)el.innerHTML=formatRanks(result.data);
   status(statusId,'อัปเดตอันดับแล้ว • '+(result.data||[]).length+' รายการ');
+  if(chart){
+   chart.innerHTML='<p class="lb-muted" role="status">กำลังโหลดสถิติ…</p>';
+   try{
+    var stats=await sb.rpc('get_quiz_statistics');
+    if(token!==boardToken)return;
+    if(stats.error)throw stats.error;
+    chart.innerHTML=formatStatistics(stats.data,packId);
+   }catch(statsError){
+    if(token===boardToken)chart.innerHTML='<p class="lb-muted" role="status">ยังโหลดสถิติไม่ได้ ลองอัปเดตอีกครั้ง หากยังไม่เคยเปิดใช้ ให้ผู้ดูแลรัน leaderboard-stats.sql</p>';
+   }
+  }
  }catch(e){
+  if(token!==boardToken)return;
   status(statusId,'ยังโหลดอันดับไม่ได้: '+(e.message||'โปรดลองใหม่'));
  }
 }

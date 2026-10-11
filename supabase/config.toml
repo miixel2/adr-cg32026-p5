@@ -1,0 +1,3 @@
+[functions.notify-feedback]
+# Database webhook uses a separate server secret, validated inside the handler.
+verify_jwt = false
