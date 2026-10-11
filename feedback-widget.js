@@ -14,8 +14,8 @@ function openFeedback(questionId){
  form.reset();form.hidden=false;
  byId('feedback-done').hidden=true;
  message('');
- var inExam=!byId('exam').classList.contains('hidden');
- var inResult=!byId('result').classList.contains('hidden');
+ var inExam=byId('exam')&&!byId('exam').classList.contains('hidden');
+ var inResult=byId('result')&&!byId('result').classList.contains('hidden');
  var active=inExam?session:(inResult?finalSession:null);
  context={packId:active?active.pack.id:null,questions:active?active.qs:BANK};
  var select=byId('feedback-question');select.replaceChildren();
@@ -47,7 +47,7 @@ async function submitFeedback(event){
   var result=await client.rpc('submit_quiz_feedback',{
    p_kind:correction?'correction':'general',p_message:text,
    p_suggested_correction:correction?byId('feedback-suggestion').value.trim():'',
-   p_pack_id:context.packId,p_question_id:q?q.id:null,p_question_text:snapshot
+   p_pack_id:context.packId||(q?q.cat:null),p_question_id:q?q.id:null,p_question_text:snapshot
   });
   if(result.error)throw result.error;
   form.hidden=true;byId('feedback-done').hidden=false;
@@ -71,14 +71,14 @@ function init(){
   '<div id="feedback-done" hidden><button type="button" class="btn" id="feedback-done-close">กลับไปทำแบบฝึกหัด</button></div>'+
   '<p id="feedback-status" role="status" class="feedback-status"></p></dialog>');
  dialog=byId('feedback-dialog');form=byId('feedback-form');
- document.querySelector('#home .intro .buttons').insertAdjacentHTML('beforeend','<button type="button" class="btn secondary" data-feedback>💬 แนะนำติชม</button>');
- document.querySelector('#exam .quiz-box > .buttons').insertAdjacentHTML('beforeend','<button type="button" class="btn secondary sm" data-feedback>💬 แนะนำติชม / แจ้งแก้ไขข้อนี้</button>');
- document.querySelector('#result .lb-shortcuts').insertAdjacentHTML('beforeend','<button type="button" class="btn secondary" data-feedback>💬 แนะนำติชม / แจ้งแก้ไขข้อสอบ</button>');
+ var targets=[['#home .intro .buttons','💬 แนะนำติชม'],['#exam .quiz-box > .buttons','💬 แนะนำติชม / แจ้งแก้ไขข้อนี้'],['#result .lb-shortcuts','💬 แนะนำติชม / แจ้งแก้ไขข้อสอบ']];
+ targets.forEach(function(target){var container=document.querySelector(target[0]);if(container)container.insertAdjacentHTML('beforeend','<button type="button" class="btn secondary" data-feedback>'+target[1]+'</button>')});
  document.querySelector('.footer').insertAdjacentHTML('afterbegin','<div class="feedback-footer"><button type="button" class="btn secondary sm" data-feedback>💬 แนะนำติชม</button></div>');
  document.addEventListener('click',function(event){
   var trigger=event.target.closest('[data-feedback]');
   if(trigger)openFeedback(trigger.dataset.feedback||null);
  });
+ if(typeof renderResult==='function'){
  var previousRender=renderResult;
  renderResult=function(){
   previousRender.apply(this,arguments);
@@ -87,13 +87,14 @@ function init(){
    button.textContent='แจ้งแก้ไขข้อนี้';button.dataset.feedback=finalSession.qs[i].id;item.appendChild(button);
   });
  };
+ }
  byId('feedback-kind').addEventListener('change',refreshKind);
  form.addEventListener('submit',submitFeedback);
  function close(){if(!sending)dialog.close()}
  byId('feedback-close').addEventListener('click',close);
  byId('feedback-done-close').addEventListener('click',close);
  dialog.addEventListener('cancel',function(event){if(sending)event.preventDefault()});
- dialog.addEventListener('close',function(){if(opener&&opener.isConnected)opener.focus()});
+ dialog.addEventListener('close',function(){if(opener&&opener.isConnected)opener.focus({preventScroll:true})});
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();

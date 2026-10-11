@@ -1,0 +1,26 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "low-contrast",
+        "value": "*",
+        "files": [
+          "review.html"
+        ],
+        "createdAt": "2026-10-11T13:52:11.657Z",
+        "reason": "Agent verified screen header background rgb(11,78,134) with light text; print hides navigation and changes paragraph text to rgb(23,51,84) on white. The detector mixes mutually exclusive screen and print styles."
+      },
+      {
+        "rule": "low-contrast",
+        "value": "*",
+        "files": [
+          "tutorial.html"
+        ],
+        "createdAt": "2026-10-11T13:56:41.434Z",
+        "reason": "Agent verified light header text on navy in screen mode; print hides nav and renders dark paragraph text on white. Detector conflates screen text and print backgrounds; actual CTA hover contrast has been corrected and browser-checked."
+      }
+    ]
+  }
+}

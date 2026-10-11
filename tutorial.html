@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width,initial-scale=1">
+ <meta name="description" content="เรียนรู้วิธีใช้แบบฝึกหัด ป.5 แบบสั้น ๆ พร้อมตัวอย่างสนุก ๆ: ทำข้อสอบ ส่งคำตอบ บันทึกคะแนน ดูอันดับ และแนะนำติชม">
+ <title>วิธีใช้แบบฝึกหัด · ป.5</title>
+ <link rel="stylesheet" href="review.css?v=1">
+ <link rel="stylesheet" href="tutorial.css?v=1">
+</head>
+<body>
+ <header class="review-header"><div class="review-container">
+  <nav aria-label="นำทาง"><a href="index.html">← กลับไปทำแบบฝึกหัด</a> <a href="review.html">ตรวจทานข้อสอบและเฉลย</a></nav>
+  <h1>ทำข้อสอบเป็นใน 5 ขั้นตอน</h1>
+  <p>ให้น้องจิ๋วพาลองกดเล่น แล้วไปทำแบบฝึกหัดจริงกัน!</p>
+ </div></header>
+ <main class="review-container tutorial-main">
+  <nav class="tutorial-steps" aria-label="เลือกขั้นตอนเรียนรู้">
+   <button type="button" data-step="0" aria-controls="lesson-start" aria-pressed="true">1 · เลือกชุด</button>
+   <button type="button" data-step="1" aria-controls="lesson-answer" aria-pressed="false">2 · ตอบและส่ง</button>
+   <button type="button" data-step="2" aria-controls="lesson-save" aria-pressed="false">3 · บันทึกคะแนน</button>
+   <button type="button" data-step="3" aria-controls="lesson-board" aria-pressed="false">4 · ดูอันดับ</button>
+   <button type="button" data-step="4" aria-controls="lesson-feedback" aria-pressed="false">5 · ติชม</button>
+  </nav>
+  <div class="tutorial-guide"><span class="tutorial-chick" id="tutorial-chick" aria-hidden="true">🐣</span><p id="tutorial-speech">พร้อมแล้ว! จิ้มปุ่ม ไม่ต้องจิ้มฉันนะ</p></div>
+  <p class="tutorial-demo-note">ตัวอย่างสำหรับลองกดเท่านั้น ไม่จับเวลา ไม่บันทึกคะแนน และไม่ส่งความคิดเห็นจริง</p>
+  <section class="tutorial-lesson" id="lesson-start" aria-labelledby="start-title">
+   <div class="tutorial-copy"><h2 id="start-title" tabindex="-1">เลือกวิชา แล้วเริ่มทำข้อสอบ</h2><p>ที่หน้าแรก เลือกวิชาหรือชุดฝึก แล้วกด <strong>เริ่มทำข้อสอบ →</strong></p><p class="tutorial-tip">ทำแบบฝึกหัดได้ทันที ไม่ต้องสมัครบัญชี</p></div>
+   <div class="tutorial-demo"><p class="tutorial-demo-label">ลองเลือกชุดฝึก</p><div class="tutorial-pack-grid">
+    <div class="tutorial-pack"><span aria-hidden="true">🍕</span><h3>เศษส่วน</h3><p>ฝึกทีละบท</p><button type="button" class="btn secondary" data-demo-start="เศษส่วน">เริ่มทำข้อสอบ →</button></div>
+    <div class="tutorial-pack"><span aria-hidden="true">🔤</span><h3>ภาษาอังกฤษ</h3><p>ฝึกคำศัพท์และประโยค</p><button type="button" class="btn secondary" data-demo-start="ภาษาอังกฤษ">เริ่มทำข้อสอบ →</button></div>
+   </div><p class="tutorial-demo-status" id="start-demo-status" role="status">กดชุดไหนก็ได้ น้องจิ๋วพร้อมลุย!</p></div>
+  </section>
+  <section class="tutorial-lesson" id="lesson-answer" aria-labelledby="answer-title">
+   <div class="tutorial-copy"><h2 id="answer-title" tabindex="-1">เลือกคำตอบ แล้วส่งเพื่อดูคะแนน</h2><p>กดตัวเลือก ใช้ <strong>ก่อนหน้า / ข้อต่อไป</strong> หรือเลขข้อเพื่อไปยังข้ออื่น</p><p>เมื่อพร้อม กด <strong>ส่งคำตอบและดูคะแนน</strong> แล้วอ่านเฉลยและวิธีคิด</p><p class="tutorial-tip">คะแนนและประวัติจะเก็บในเบราว์เซอร์เครื่องนี้ • ชุดที่จับเวลาจะส่งคำตอบเมื่อหมดเวลา</p></div>
+   <div class="tutorial-demo"><p class="tutorial-demo-label">ลองตอบ 1 ข้อ</p><h3>1/2 + 1/4 = ?</h3><div class="tutorial-choices" id="demo-choices">
+    <button type="button" data-answer="0" aria-pressed="false">ก. 1/6</button><button type="button" data-answer="1" aria-pressed="false">ข. 2/6</button><button type="button" data-answer="2" aria-pressed="false">ค. 3/4</button><button type="button" data-answer="3" aria-pressed="false">ง. 1/8</button>
+   </div><button type="button" class="btn" id="demo-submit-answer" disabled>ส่งคำตอบและดูคะแนน</button><p class="tutorial-demo-status" id="answer-demo-status" role="status">เลือกคำตอบก่อน แล้วลองกดส่ง</p></div>
+  </section>
+  <section class="tutorial-lesson" id="lesson-save" aria-labelledby="save-title">
+   <div class="tutorial-copy"><h2 id="save-title" tabindex="-1">อยากแชร์คะแนน? เลือกยินยอมก่อน</h2><p>ในหน้าผลสอบ ติ๊กยินยอม ใส่ชื่อเล่นหรือเว้นว่างเพื่อสุ่มชื่อ แล้วกด <strong>ยืนยันบันทึกลง Leaderboard</strong></p><p class="tutorial-tip">ไม่ติ๊กก็ได้ คะแนนยังอยู่ในเครื่องตามปกติ • ไม่ใช้ชื่อจริงหรือข้อมูลส่วนตัว</p></div>
+   <div class="tutorial-demo"><p class="tutorial-demo-label">ลองบันทึกคะแนนตัวอย่าง</p><div class="tutorial-score">คะแนนตัวอย่าง <strong>40 / 50</strong></div>
+    <label class="tutorial-consent"><input id="demo-consent" type="checkbox"> ฉันต้องการแสดงคะแนนบน Leaderboard</label>
+    <div id="demo-save-fields" hidden><label for="demo-nickname">ชื่อเล่น (เว้นว่างได้)</label><input id="demo-nickname" maxlength="24" placeholder="เช่น ดาวน้อย" autocomplete="off"><button type="button" class="btn" id="demo-save-score">ยืนยันบันทึกลง Leaderboard</button></div>
+    <p class="tutorial-demo-status" id="save-demo-status" role="status">คะแนนอยู่ในเครื่อง ยังไม่แชร์ออนไลน์</p>
+   </div>
+  </section>
+  <section class="tutorial-lesson" id="lesson-board" aria-labelledby="board-title">
+   <div class="tutorial-copy"><h2 id="board-title" tabindex="-1">ดูอันดับได้โดยไม่ต้องแชร์คะแนน</h2><p>หน้าแรกกด <strong>🏆 ดู Leaderboard</strong> แล้วเลือกชุดข้อสอบ ในหน้าผลสอบกด <strong>ดูอันดับของชุดนี้</strong></p><p class="tutorial-tip">กด <strong>อัปเดตอันดับ</strong> เพื่อดูข้อมูลล่าสุด • อันดับแยกตามชุดและใช้คะแนนดีที่สุด</p></div>
+   <div class="tutorial-demo"><p class="tutorial-demo-label">ลองเปิดอันดับตัวอย่าง</p><button type="button" class="btn secondary" id="demo-show-board">🏆 ดู Leaderboard</button>
+    <div id="demo-board" hidden><p><strong>ชุดจำลองรวม 5 วิชา · ตัวอย่างสมมติ</strong></p><div class="tutorial-rank"><span>🥇 ดาวสายฟ้า</span><strong>48 / 50</strong></div><div class="tutorial-rank"><span>🥈 เมฆยิ้มแฉ่ง</span><strong>45 / 50</strong></div><div class="tutorial-rank tutorial-own"><span>🥉 ดาวน้อย</span><strong>40 / 50</strong></div></div>
+    <p class="tutorial-demo-status" id="board-demo-status" role="status">ลองดูอันดับ ไม่ต้องบันทึกคะแนนก่อน</p>
+   </div>
+  </section>
+  <section class="tutorial-lesson" id="lesson-feedback" aria-labelledby="feedback-title">
+   <div class="tutorial-copy"><h2 id="feedback-title" tabindex="-1">เจอข้อผิดพลาด? บอกเราได้เลย</h2><p>กด <strong>แนะนำติชม</strong> เลือกเรื่องที่ต้องการแนะนำ แล้วใส่รายละเอียดและกดส่ง</p><p>ถ้าโจทย์หรือเฉลยผิด กด <strong>แจ้งแก้ไขข้อนี้</strong> ในหน้าตรวจทาน ระบบจะเลือกข้อให้แล้ว</p><p class="tutorial-tip">ข้อความส่งให้ผู้ดูแลเท่านั้น ไม่แสดงต่อสาธารณะ • ไม่ใส่ชื่อจริง อีเมล หรือเบอร์โทร</p></div>
+   <div class="tutorial-demo"><p class="tutorial-demo-label">ลองส่งความคิดเห็นตัวอย่าง</p><button type="button" class="btn secondary" id="demo-open-feedback">แนะนำติชม</button>
+    <div id="demo-feedback-fields" hidden><label for="demo-feedback-text">รายละเอียดตัวอย่าง</label><textarea id="demo-feedback-text" rows="3" maxlength="3000">อยากให้เพิ่มคำอธิบายข้อนี้อีกนิด ขอบคุณค่ะ</textarea><button type="button" class="btn" id="demo-send-feedback">ส่งความคิดเห็น</button></div>
+    <p class="tutorial-demo-status" id="feedback-demo-status" role="status">แค่ลองกด ไม่ส่งข้อความจริงนะ!</p>
+   </div>
+  </section>
+  <div class="tutorial-navigation"><button type="button" class="btn secondary" id="tutorial-prev" disabled>← ก่อนหน้า</button><p id="tutorial-progress" role="status">ขั้นตอน 1 / 5</p><button type="button" class="btn" id="tutorial-next">ต่อไป →</button></div>
+  <div class="tutorial-finish"><a class="btn" href="index.html">พร้อมแล้ว ไปทำแบบฝึกหัด →</a><a href="review.html">ดูข้อสอบและเฉลยทั้งหมด</a></div>
+  <noscript><p>อ่านทั้ง 5 ขั้นตอนได้ด้านบน เปิด JavaScript หากต้องการลองกดตัวอย่าง</p></noscript>
+  <footer class="footer">สื่อฝึก ป.5 ที่จัดทำขึ้นโดยอิสระ • ไม่ใช่ข้อสอบจริงหรือเว็บไซต์ทางการของโรงเรียน</footer>
+ </main>
+ <script src="tutorial.js?v=1"></script>
+</body>
+</html>

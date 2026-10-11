@@ -1,0 +1,51 @@
+.review-header nav{display:flex;gap:20px;flex-wrap:wrap}
+.tutorial-main{padding-top:24px}
+.tutorial-steps{display:flex;gap:8px;flex-wrap:wrap}
+.tutorial-steps button{font:inherit;font-size:14px;font-weight:650;border:1px solid #adc5dc;border-radius:8px;padding:10px 14px;min-height:44px;background:white;color:var(--ink)}
+.tutorial-steps button[aria-pressed="true"]{background:#0b4e86;color:white;border-color:#0b4e86}
+.tutorial-guide{display:flex;align-items:center;gap:16px;margin:24px 0 10px}
+.tutorial-chick{display:grid;place-items:center;font-size:52px;min-width:70px;height:76px;transform-origin:50% 90%}
+.tutorial-chick.is-celebrating{animation:chick-celebrate .65s cubic-bezier(.16,1,.3,1)}
+.tutorial-guide p{margin:0;background:#fff5d9;color:#68470a;border-radius:12px;padding:12px 16px;font-weight:650;max-width:65ch}
+.tutorial-demo-note{font-size:13px;color:var(--muted);margin:0 0 24px}
+.tutorial-lesson{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start;margin:0 0 28px}
+.tutorial-copy h2{font-size:clamp(23px,3vw,28px);line-height:1.4;margin:0 0 14px;scroll-margin-top:20px}
+.tutorial-copy p{margin:0 0 14px;max-width:65ch}
+.tutorial-tip{font-size:14px;color:var(--muted)}
+.tutorial-demo{background:white;border:1px solid var(--border);border-radius:12px;padding:22px;overflow:hidden}
+.tutorial-demo-label{font-size:13px;color:var(--muted);margin:0 0 16px}
+.tutorial-pack-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tutorial-pack{padding:12px 0;min-width:0}
+.tutorial-pack>span{font-size:32px}
+.tutorial-pack h3{font-size:18px;margin:8px 0 4px}
+.tutorial-pack p{font-size:13px;color:var(--muted);margin:0 0 12px}
+.tutorial-pack .btn{font-size:13px;padding:9px 10px}
+.tutorial-pack.is-selected{background:#e9f6ff;border-radius:8px;padding:12px 8px}
+.tutorial-demo-status{font-size:14px;color:#0b4e86;min-height:48px;margin:18px 0 0;overflow-wrap:anywhere}
+.tutorial-demo-status.is-success{color:var(--good);font-weight:650}
+.tutorial-choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+.tutorial-choices button{font:inherit;min-height:46px;border:1px solid #adc5dc;border-radius:8px;background:white;color:var(--ink);padding:10px;text-align:left}
+.tutorial-choices button[aria-pressed="true"]{background:#e9f6ff;border-color:#1475b8;outline:1px solid #1475b8}
+.tutorial-choices button.is-correct{background:#eafaf5;border-color:#08664f;color:#08664f}
+.tutorial-demo .btn{margin-top:4px}
+.tutorial-score{display:flex;align-items:center;justify-content:space-between;gap:16px;background:#edf5fb;border-radius:8px;padding:14px;margin-bottom:18px}
+.tutorial-score strong{font-size:26px;font-variant-numeric:tabular-nums;color:#0b4e86}
+.tutorial-consent{display:flex;gap:10px;align-items:center;font-weight:650;cursor:pointer}
+.tutorial-consent input{width:20px;height:20px;accent-color:#1475b8;flex:none;cursor:pointer}
+.tutorial-demo div>label:not(.tutorial-consent){display:block;font-size:14px;font-weight:650;margin:16px 0 6px}
+.tutorial-demo input:not([type="checkbox"]),.tutorial-demo textarea{font:inherit;background:white;color:var(--ink);border:1px solid #adc5dc;border-radius:8px;padding:10px 12px;width:100%;min-height:44px;margin:0 0 12px}
+.tutorial-demo textarea{resize:vertical;line-height:1.6}
+.tutorial-demo input::placeholder{color:var(--muted);opacity:1}
+.tutorial-rank{display:flex;justify-content:space-between;gap:12px;padding:12px 8px;border-bottom:1px solid var(--border);font-size:14px}
+.tutorial-own{background:#fff5d9;color:#68470a}
+.tutorial-demo .is-revealing{animation:demo-reveal .3s cubic-bezier(.16,1,.3,1)}
+.tutorial-navigation{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:18px;border-top:1px solid var(--border)}
+.tutorial-navigation p{font-size:14px;color:var(--muted);margin:0;text-align:center}
+.tutorial-finish{display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-top:24px}
+.tutorial-finish a.btn{text-decoration:none;display:inline-flex;align-items:center;background:#1475b8;color:white}
+.tutorial-finish a.btn:hover{background:#0b5b97;color:white}
+@keyframes chick-celebrate{0%{transform:translateY(0) rotate(0)}35%{transform:translateY(-14px) rotate(-9deg)}65%{transform:translateY(-5px) rotate(7deg)}100%{transform:translateY(0) rotate(0)}}
+@keyframes demo-reveal{from{transform:translateY(6px);opacity:.7}to{transform:translateY(0);opacity:1}}
+@media(max-width:720px){.tutorial-lesson{grid-template-columns:1fr;gap:12px}.tutorial-steps{gap:6px}.tutorial-steps button{font-size:13px;padding:8px 10px}.tutorial-demo{padding:18px}.tutorial-guide{gap:10px}.tutorial-chick{min-width:52px;font-size:42px}.tutorial-guide p{font-size:14px;padding:10px 12px}.tutorial-navigation .btn{font-size:14px}.tutorial-finish{gap:14px}}
+@media(prefers-reduced-motion:reduce){.tutorial-chick.is-celebrating,.tutorial-demo .is-revealing{animation:none}}
+@media print{.tutorial-steps,.tutorial-guide,.tutorial-demo-note,.tutorial-navigation,.tutorial-finish{display:none!important}.tutorial-lesson[hidden]{display:grid!important}.tutorial-lesson{break-inside:avoid;gap:20px}.tutorial-demo{display:none}.tutorial-copy{grid-column:1/-1}}

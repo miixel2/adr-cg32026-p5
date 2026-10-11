@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width,initial-scale=1">
+ <meta name="description" content="ตรวจทานโจทย์ ตัวเลือก เฉลย และคำอธิบายแบบฝึกหัด ป.5 ครบทุกวิชา พร้อมค้นหาและแจ้งแก้ไขรายข้อ">
+ <title>ตรวจทานข้อสอบและเฉลย · แบบฝึกหัด ป.5</title>
+ <link rel="stylesheet" href="review.css?v=1">
+ <link rel="stylesheet" href="feedback.css?v=1">
+</head>
+<body>
+ <header class="review-header"><div class="review-container">
+  <nav aria-label="นำทาง"><a href="index.html">← กลับไปทำแบบฝึกหัด</a> · <a href="tutorial.html">วิธีใช้แบบฝึกหัด</a></nav>
+  <h1>ตรวจทานข้อสอบและเฉลย</h1>
+  <p>โจทย์ ตัวเลือก คำตอบ และวิธีคิดจากชุดเดียวกับหน้าแบบฝึกหัด • สำหรับครู ผู้ปกครอง และผู้ตรวจทาน</p>
+ </div></header>
+ <main class="review-container">
+  <aside class="review-notice">แบบฝึกหัดเพื่อการศึกษา จัดทำขึ้นโดยอิสระ ไม่ใช่ข้อสอบจริงหรือเว็บไซต์ทางการของโรงเรียน เนื้อหาอาจมีข้อผิดพลาด หากพบปัญหา กด <strong>แจ้งแก้ไขข้อนี้</strong> เพื่อส่งให้ผู้ดูแลตรวจสอบ</aside>
+  <section class="review-tools" aria-label="ค้นหาและกรองข้อสอบ">
+   <div class="review-fields">
+    <div class="review-search"><label for="review-search">ค้นหาข้อสอบ</label><input id="review-search" type="search" placeholder="เช่น Q069, เศษส่วน, rice หรือคำในเฉลย" autocomplete="off" aria-controls="review-questions"></div>
+    <div><label for="review-subject">วิชา</label><select id="review-subject" aria-controls="review-questions"><option value="all">ทุกวิชา</option><option value="math">คณิตศาสตร์</option><option value="english">ภาษาอังกฤษ</option><option value="thai">ภาษาไทย</option><option value="social">สังคม / ประวัติศาสตร์</option><option value="science">วิทยาศาสตร์</option></select></div>
+    <div><label for="review-topic">หัวข้อ</label><select id="review-topic" aria-controls="review-questions"><option value="all">ทุกหัวข้อ</option></select></div>
+   </div>
+   <div class="review-controls">
+    <div class="review-actions"><button type="button" class="btn secondary" id="review-expand">ขยายทั้งหมด</button><button type="button" class="btn secondary" id="review-collapse">ย่อทั้งหมด</button><button type="button" class="btn secondary" id="review-reset">ล้างตัวกรอง</button></div>
+    <div class="review-actions"><button type="button" class="btn secondary" id="review-print">พิมพ์ / บันทึก PDF</button><button type="button" class="btn secondary" data-feedback>แนะนำติชม</button></div>
+   </div>
+   <p class="review-count" id="review-count" role="status" aria-live="polite"></p>
+  </section>
+  <p class="review-help">กดที่โจทย์เพื่อแสดงหรือซ่อนตัวเลือกและเฉลย • ขยาย/ย่อทั้งหมดมีผลเฉพาะข้อที่ตรงกับตัวกรอง • แต่ละข้อมีลิงก์สำหรับส่งต่อให้ผู้ตรวจทาน</p>
+  <div id="review-questions"></div>
+  <div id="review-empty" class="review-empty" hidden><h2>ไม่พบข้อสอบที่ตรงกับการค้นหา</h2><p>ลองลดคำค้น เปลี่ยนวิชา หรือกดล้างตัวกรอง</p><button type="button" class="btn secondary" id="review-empty-reset">แสดงข้อสอบทั้งหมด</button></div>
+  <noscript><p>โปรดเปิด JavaScript เพื่อแสดงข้อสอบและเฉลย</p></noscript>
+  <footer class="footer">แบบฝึกหัด ป.5 ที่จัดทำขึ้นโดยอิสระ • ไม่ใช่ข้อสอบจริง<br>ความคิดเห็นจะส่งให้ผู้ดูแลเฉพาะเมื่อกดส่ง ไม่แสดงต่อสาธารณะ</footer>
+ </main>
+ <script src="question-bank.js?v=1"></script>
+ <script src="review.js?v=1"></script>
+ <script src="config.js?v=3"></script>
+ <script src="supabase-client.js?v=1"></script>
+ <script src="feedback-widget.js?v=2"></script>
+</body>
+</html>
