@@ -149,6 +149,26 @@ function celebrate(){
 function init(){
  var home=document.getElementById('home'),result=document.querySelector('#result .quiz-box');
  if(!home||!result||typeof PACKS==='undefined')return;
+ var tabs=[['all','🌈 ทุกวิชา'],['math','🧮 คณิตศาสตร์'],['english','🔤 อังกฤษ'],['thai','📖 ภาษาไทย'],['social','🌏 สังคม/ประวัติศาสตร์'],['science','🔬 วิทยาศาสตร์']];
+ var filterBox=document.getElementById('packs');
+ filterBox.insertAdjacentHTML('beforebegin','<div class="subject-ribbon" id="subject-filters" aria-label="เลือกวิชา"></div>');
+ var filters=document.getElementById('subject-filters');
+ tabs.forEach(function(tab){
+  var b=document.createElement('button');b.className='subject-filter'+(tab[0]==='all'?' selected':'');
+  b.type='button';b.textContent=tab[1];b.setAttribute('aria-pressed',tab[0]==='all'?'true':'false');
+  b.addEventListener('click',function(){
+   Array.from(filters.children).forEach(function(child){child.classList.remove('selected');child.setAttribute('aria-pressed','false')});
+   b.classList.add('selected');b.setAttribute('aria-pressed','true');
+   Array.from(filterBox.children).forEach(function(card,i){
+    var pack=PACKS[i];
+    var show=tab[0]==='all'||(tab[0]==='math'
+      ? ['fractions','decimals','data','mathmock'].includes(pack.id)
+      : pack.id===tab[0]);
+    card.classList.toggle('hidden',!show);
+   });
+  });
+  filters.appendChild(b);
+ });
  var earlier=home.querySelector('.section:has(#history)');
  if(earlier)earlier.insertAdjacentHTML('beforebegin',boardMarkup());
  else home.insertAdjacentHTML('beforeend',boardMarkup());
