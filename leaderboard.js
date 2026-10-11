@@ -3,15 +3,25 @@
 'use strict';
 var cfg=window.QUIZ_CONFIG||{};
 var client=null;
+var supabaseLoader=null;
 var currentAttempt=null;
 var busy=false;
 var boardToken=0;
 var NICK_ADJ=['ดาว','เมฆ','รุ้ง','ฟ้า','แสง','เก่ง','ใจดี','จิ๋ว','ฮีโร่','นักสืบ'];
 var NICK_NOUN=['น้อย','สายฟ้า','ตัวจิ๋ว','แสนสนุก','นักสำรวจ','หรรษา','อัจฉริยะ','ยิ้มแฉ่ง'];
 function ready(){return /^https:\/\/[a-z0-9.-]+\.supabase\.co\/?$/i.test(cfg.supabaseUrl||'') && (cfg.supabaseAnonKey||'').length>20}
-function getClient(){
+async function getClient(){
  if(!ready())throw Error('ยังไม่ได้เชื่อมต่อฐานข้อมูล กรุณาตั้งค่า config.js ก่อน');
- if(!window.supabase||!window.supabase.createClient)throw Error('โหลดไลบรารี Supabase ไม่สำเร็จ กรุณาตรวจการเชื่อมต่ออินเทอร์เน็ต');
+ if(!window.supabase||!window.supabase.createClient){
+  if(!supabaseLoader)supabaseLoader=new Promise(function(resolve,reject){
+    var s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js';
+    s.onload=resolve;s.onerror=function(){supabaseLoader=null;reject(Error('ไม่สามารถโหลด Supabase SDK ได้'))};
+    document.head.appendChild(s);
+  });
+  await supabaseLoader;
+ }
+ if(!window.supabase||!window.supabase.createClient)throw Error('โหลด Supabase SDK ไม่สำเร็จ');
  if(!client)client=window.supabase.createClient(cfg.supabaseUrl.replace(/\/$/,''),cfg.supabaseAnonKey,{auth:{autoRefreshToken:true,persistSession:true,detectSessionInUrl:false}});
  return client;
 }
@@ -64,7 +74,7 @@ async function updateBoard(packId,rowsId,statusId){
  }
  status(statusId,'กำลังโหลดอันดับ…');
  try{
-  var sb=getClient();
+  var sb=await getClient();
   var result=await sb.rpc('get_quiz_leaderboard',{p_pack_id:packId,p_limit:15});
   if(result.error)throw result.error;
   if(token!==boardToken)return;
@@ -86,7 +96,7 @@ async function sendScore(){
  var name=raw||randomName();
  busy=true;button.disabled=true;status('lb-save-status','กำลังบันทึกคะแนน…');
  try{
-  var sb=getClient();
+  var sb=await getClient();
   var sessionRes=await sb.auth.getSession();
   if(sessionRes.error)throw sessionRes.error;
   if(!sessionRes.data.session){
