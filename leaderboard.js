@@ -1,30 +1,13 @@
 /* Optional Supabase leaderboard: no data leaves the browser unless a player opts in. */
 (function(){
 'use strict';
-var cfg=window.QUIZ_CONFIG||{};
-var client=null;
-var supabaseLoader=null;
 var currentAttempt=null;
 var busy=false;
 var boardToken=0;
 var NICK_ADJ=['ดาว','เมฆ','รุ้ง','ฟ้า','แสง','เก่ง','ใจดี','จิ๋ว','ฮีโร่','นักสืบ'];
 var NICK_NOUN=['น้อย','สายฟ้า','ตัวจิ๋ว','แสนสนุก','นักสำรวจ','หรรษา','อัจฉริยะ','ยิ้มแฉ่ง'];
-function ready(){return /^https:\/\/[a-z0-9.-]+\.supabase\.co\/?$/i.test(cfg.supabaseUrl||'') && (cfg.supabaseAnonKey||'').length>20}
-async function getClient(){
- if(!ready())throw Error('ยังไม่ได้เชื่อมต่อฐานข้อมูล กรุณาตั้งค่า config.js ก่อน');
- if(!window.supabase||!window.supabase.createClient){
-  if(!supabaseLoader)supabaseLoader=new Promise(function(resolve,reject){
-    var s=document.createElement('script');
-    s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js';
-    s.onload=resolve;s.onerror=function(){supabaseLoader=null;reject(Error('ไม่สามารถโหลด Supabase SDK ได้'))};
-    document.head.appendChild(s);
-  });
-  await supabaseLoader;
- }
- if(!window.supabase||!window.supabase.createClient)throw Error('โหลด Supabase SDK ไม่สำเร็จ');
- if(!client)client=window.supabase.createClient(cfg.supabaseUrl.replace(/\/$/,''),cfg.supabaseAnonKey,{auth:{autoRefreshToken:true,persistSession:true,detectSessionInUrl:false}});
- return client;
-}
+function ready(){return window.QuizBackend.isConfigured()}
+function getClient(){return window.QuizBackend.getClient()}
 function randomName(){
  var a=NICK_ADJ[Math.floor(Math.random()*NICK_ADJ.length)],n=NICK_NOUN[Math.floor(Math.random()*NICK_NOUN.length)];
  return a+n+'-'+String(Math.floor(Math.random()*900)+100);

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width,initial-scale=1">
+ <meta name="robots" content="noindex,nofollow">
+ <meta name="referrer" content="no-referrer">
+ <title>จัดการความคิดเห็น · แบบฝึกหัด ป.5</title>
+ <link rel="stylesheet" href="feedback.css?v=1">
+</head>
+<body class="feedback-admin">
+ <header class="feedback-admin-header"><h1>จัดการความคิดเห็น</h1><p>คำแนะนำและรายงานแก้ไขข้อสอบ · สำหรับผู้ดูแลที่ได้รับสิทธิ์เท่านั้น</p></header>
+ <main>
+  <section id="admin-login" class="feedback-login" aria-labelledby="login-title">
+   <h2 id="login-title">เข้าสู่ระบบผู้ดูแล</h2>
+   <p class="feedback-muted">ใช้บัญชี Supabase ที่ผู้ดูแลโครงการอนุญาตไว้ ไม่มีการสมัครบัญชีจากหน้านี้</p>
+   <form id="admin-login-form">
+    <label for="admin-email">อีเมล</label><input id="admin-email" type="email" required autocomplete="username">
+    <label for="admin-password">รหัสผ่าน</label><input id="admin-password" type="password" required autocomplete="current-password">
+    <button type="submit" class="btn" id="admin-login-button">เข้าสู่ระบบ</button>
+   </form>
+  </section>
+  <p id="admin-status" role="status" class="feedback-status"></p>
+  <section id="admin-workspace" hidden aria-label="รายการความคิดเห็น">
+   <div class="feedback-toolbar">
+    <div class="feedback-filters">
+     <div><label for="admin-filter-status">สถานะ</label><select id="admin-filter-status"><option value="open">รอตรวจสอบ</option><option value="resolved">แก้ไขแล้ว</option><option value="archived">เก็บเข้าคลัง</option><option value="all">ทั้งหมด</option></select></div>
+     <div><label for="admin-filter-kind">ประเภท</label><select id="admin-filter-kind"><option value="all">ทุกประเภท</option><option value="general">คำแนะนำ / ติชม</option><option value="correction">แจ้งแก้ไขข้อสอบ</option></select></div>
+    </div>
+    <div class="feedback-actions"><button type="button" class="btn secondary" id="admin-refresh">อัปเดต</button><button type="button" class="btn secondary" id="admin-signout">ออกจากระบบ</button></div>
+   </div>
+   <p class="feedback-muted">การเปลี่ยนสถานะจัดการรายงานเท่านั้น ไม่แก้โจทย์หรือเฉลยในเว็บไซต์โดยอัตโนมัติ</p>
+   <div id="admin-list" aria-busy="false"></div>
+   <nav class="feedback-pagination" aria-label="หน้ารายการความคิดเห็น"><button type="button" class="btn secondary" id="admin-prev">ก่อนหน้า</button><span id="admin-page"></span><button type="button" class="btn secondary" id="admin-next">ถัดไป</button></nav>
+  </section>
+ </main>
+ <script src="config.js?v=3"></script>
+ <script src="supabase-client.js?v=1"></script>
+ <script src="feedback-admin.js?v=1"></script>
+</body>
+</html>

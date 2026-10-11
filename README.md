@@ -11,6 +11,8 @@
 - ตอบผ่านมือถือ, จับเวลา, ตรวจคะแนนพร้อมคำอธิบาย, สรุปรายวิชา, ทำเฉพาะข้อผิด, ประวัติคะแนนในเบราว์เซอร์
 - ธีมฟ้า–ทองสดใส มีการเคลื่อนไหวและรองรับการตั้งค่าลดการเคลื่อนไหวของระบบ
 - Leaderboard แยกทั้ง 9 ชุด (เมื่อเชื่อม Supabase): เลือกบันทึกหรือไม่ก็ได้ ชื่อเล่นเป็นทางเลือก ถ้าเว้นว่างจะสุ่มชื่อให้อัตโนมัติ
+- 💬 แนะนำติชมผ่านหน้าต่างรับความคิดเห็น พร้อมแจ้งแก้ไขโจทย์/เฉลยของข้อที่เลือก ข้อมูลส่งให้ผู้ดูแลเท่านั้น
+- 🛠️ `feedback.html`: ผู้ดูแลเข้าสู่ระบบเพื่ออ่านรายงาน บันทึกหมายเหตุ แก้ไขสถานะ เก็บเข้าคลัง หรือลบถาวร
 
 > **สำคัญเรื่อง CI โรงเรียน**: ธีมฟ้า–ทองนี้เป็นการออกแบบเบื้องต้น **ยังไม่ใช่รหัสสีประจำโรงเรียนที่ยืนยันแล้ว** สามารถแก้ CSS Variables ในไฟล์ theme.css ได้แก่ --school-primary, --school-primary-dark, --school-gold เมื่อได้โลโก้หรือคู่มือ CI ของโรงเรียนจริง หลีกเลี่ยงการนำโลโก้โรงเรียนมาใช้โดยไม่ได้รับอนุญาต
 
@@ -32,7 +34,7 @@ Settings → Pages → Deploy from a branch → main → /(root) → Save
 **Leaderboard ยังไม่เชื่อมจริงจนกว่าจะตั้งค่า Supabase ต่อไปนี้** หากยังไม่ตั้งค่า เว็บข้อสอบและประวัติในเครื่องทำงานได้ปกติ
 
 1. สร้าง Project ใหม่ที่ https://supabase.com บน Free Plan
-2. ใน Authentication → Providers → เปิด **Anonymous Sign-Ins**
+2. ใน Authentication → Sign In / Providers → เปิด **Allow new users to sign up** และ **Allow anonymous sign-ins**
 3. ใน SQL Editor รันไฟล์ [supabase/leaderboard.sql](supabase/leaderboard.sql) ทั้งไฟล์
 4. ที่ Project Settings → API หรือ Connect คัดลอก Project URL และ **publishable key** หรือ legacy **anon key** (ใช้ได้เฉพาะ Public Client Key)
 5. แก้ไขไฟล์ config.js ใน GitHub เป็นค่า Project ของตัวเอง
@@ -66,7 +68,37 @@ Settings → Pages → Deploy from a branch → main → /(root) → Save
 - แสดงต่อสาธารณะเฉพาะ **ชื่อเล่น คะแนน ชุดข้อสอบ วันที่** ไม่ขอชื่อจริง อีเมล เบอร์โทร
 - ระบบ Anonymous Auth สร้าง ID ไม่ระบุชื่อในระบบ Auth; คะแนนดีที่สุดผูกกับ ID นี้ หากล้าง Browser หรือเปลี่ยนเครื่องจะเรียกบัญชี Anonymous เดิมไม่ได้
 - ควรใช้ชื่อเล่นสมมติ ไม่กรอกข้อมูลส่วนบุคคล
+- 💬 ความคิดเห็นจะส่งขึ้นออนไลน์เฉพาะเมื่อกด **ส่งความคิดเห็น** ไม่ขอข้อมูลติดต่อ และไม่เผยแพร่รายงานต่อสาธารณะ
 - **ปัจจุบันไม่มีปุ่มลบคะแนนออนไลน์สำหรับผู้เล่น** หากมีคำขอลบ ผู้ดูแล Supabase ต้องลบผ่าน Dashboard จึงควรจัดเตรียมช่องทางติดต่อผู้ดูแลก่อนประชาสัมพันธ์ต่อเด็กจำนวนมาก
+
+## 💬 เปิดใช้งานแนะนำติชมและหน้าผู้ดูแล
+
+- 🗃️ รัน [supabase/feedback.sql](supabase/feedback.sql) ใน Supabase SQL Editor **หลังจาก** `leaderboard.sql` สคริปต์สร้าง `quiz_feedback`, รายชื่อผู้ดูแล `feedback_admins`, RLS และ RPC รับความคิดเห็น รันซ้ำได้โดยไม่ลบรายงานเดิม
+- 🔑 ใน Authentication → Sign In / Providers เปิด **Email** สำหรับการเข้าสู่ระบบผู้ดูแล และคง **Allow new users to sign up / Allow anonymous sign-ins** ไว้สำหรับผู้เล่น
+- 👤 สร้างบัญชีผู้ดูแลแบบ Email/Password ใน Authentication → Users → Add user และยืนยันอีเมลบัญชีนั้น จากนั้นคัดลอก **User UID** บัญชีต้องเป็น permanent user ไม่ใช่ anonymous user
+- 🛡️ เพิ่มเฉพาะ UID ของ repository maintainer ผ่าน SQL Editor ไม่ใส่รหัสผ่านหรือ secret key ใน repo:
+
+  ~~~sql
+  insert into public.feedback_admins(user_id)
+  values ('REPLACE-WITH-MAINTAINER-AUTH-USER-UUID')
+  on conflict (user_id) do nothing;
+  ~~~
+
+- 🛠️ เปิด `https://miixel2.github.io/adr-cg32026-p5/feedback.html` โดยตรง ไม่มีลิงก์หน้านี้จากหน้าแบบฝึกหัด เข้าสู่ระบบด้วยบัญชีที่อนุญาตไว้
+- ✅ ผู้ดูแลกรองตามสถานะ/ประเภท บันทึกหมายเหตุ ทำเครื่องหมายแก้ไขแล้ว เปิดใหม่ เก็บเข้าคลัง และลบถาวรพร้อมยืนยันได้ รายการแบ่งหน้าละ 20 รายงาน
+- 📝 สถานะหรือหมายเหตุ **ไม่แก้โจทย์อัตโนมัติ** เมื่อตรวจแล้ว ให้แก้ข้อมูลข้อสอบใน repo และ `quiz_answer_keys` ถ้าเฉลยเปลี่ยน รายงานเก็บภาพข้อความโจทย์และเฉลย ณ วันที่ส่งเพื่อให้ตรวจย้อนหลังได้
+- 🚫 ถอนสิทธิ์ด้วย `delete from public.feedback_admins where user_id = 'THE-UUID';` ผู้ใช้ทั่วไป/anonymous ไม่สามารถอ่าน แก้ไข หรือลบรายงาน และไม่มีสิทธิ์เพิ่มตนเองเป็นผู้ดูแล
+- 🔒 GitHub Pages ให้บริการไฟล์ HTML/JavaScript ต่อสาธารณะได้ จึงซ่อน **เนื้อหารายงานและการจัดการ** ด้วย Supabase Auth + RLS ไม่ใช้ URL ลับเป็นระบบสิทธิ์ และ `noindex` เป็นเพียงคำขอไม่ให้ค้นพบหน้า ไม่ใช่การควบคุมการเข้าถึง การให้สิทธิ์ repo ไม่ได้เพิ่มสิทธิ์ Supabase โดยอัตโนมัติ
+- 🧭 Session ผู้ดูแลแยกจากผู้เล่น เก็บใน `sessionStorage` ของแท็บด้วย key `quiz-feedback-admin` การออกจากระบบผู้ดูแลไม่ออกจากบัญชี anonymous ที่ใช้บันทึกคะแนน
+- ⏱️ รับความคิดเห็นผ่าน RPC เท่านั้น จำกัด 1 รายงานต่อ 60 วินาที/ผู้ใช้ พร้อมตรวจความยาวและ Question ID ฝั่งฐานข้อมูล หากใช้งานสาธารณะในวงกว้าง ควรเปิด CAPTCHA สำหรับ anonymous sign-in; การจำกัดตาม User ID อย่างเดียวไม่ป้องกันผู้สร้างหลายบัญชี
+- 🧪 ตรวจหลังตั้งค่าจริง: ส่งคำแนะนำทั่วไป → ส่งรายงานแก้ไขข้อสอบ → บัญชีทั่วไปอ่านรายงานไม่ได้ → ผู้ดูแลเห็นและเปลี่ยนสถานะได้ → บัญชีที่ถอนสิทธิ์จัดการไม่ได้ ใช้ไฟล์ [supabase/tests/feedback-security.sql](supabase/tests/feedback-security.sql) ตรวจสิทธิ์แบบ rollback ใน SQL Editor ได้
+
+### ไฟล์ความคิดเห็น
+
+- `supabase-client.js`: โหลด SDK และแชร์ client ผู้เล่น พร้อมแยก session ผู้ดูแล
+- `feedback-widget.js` / `feedback.css`: ปุ่มแนะนำติชมและ dialog ที่รองรับคีย์บอร์ด/มือถือ
+- `feedback.html` / `feedback-admin.js`: หน้าจัดการเฉพาะผู้ดูแล ไม่มีลิงก์จากหน้าแรก
+- `supabase/feedback.sql`: migration ของฐานข้อมูลและสิทธิ์
 
 ## การตรวจทานเนื้อหา
 
