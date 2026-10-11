@@ -10,4 +10,7 @@ initExam(shuffle(selected).map(q=>q.id),p)};
 BANK.find(q=>q.id==='Q069').explain='Rice เป็นคำนามนับไม่ได้เมื่อพูดถึงข้าวโดยรวม หากต้องการนับเมล็ด ใช้ a grain of rice หรือ grains of rice';
 BANK.find(q=>q.id==='Q098').q='พระพุทธศาสนาเริ่มเผยแผ่จากดินแดนใดที่มีอิทธิพลต่อประเทศไทย';
 BANK.find(q=>q.id==='Q098').explain='พระพุทธศาสนาเกิดและเผยแผ่จากชมพูทวีปในเอเชียใต้ ก่อนแพร่หลายมายังดินแดนไทย';
+/* Put all-subject practice first; keep a clear path to every subject. */
+const packOrder=['fullmock','english','thai','social','science','fractions','decimals','data','mathmock'];
+PACKS.sort((a,b)=>packOrder.indexOf(a.id)-packOrder.indexOf(b.id));
 createPacks();
