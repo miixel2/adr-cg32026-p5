@@ -35,7 +35,7 @@ function packOptions(){
  }).join('');
 }
 function boardMarkup(){
- return '<div class="leaderboard-panel" id="leaderboard-home"><h2>🏆 กระดานนักพิชิตข้อสอบ</h2>'+
+ return '<div class="leaderboard-panel" id="leaderboard-home"><h2 id="lb-home-board" tabindex="-1">🏆 กระดานนักพิชิตข้อสอบ</h2>'+
  '<p class="lb-muted">อันดับแยกตามชุดข้อสอบ • คะแนนสูงสุดจากผู้ร่วมสนุก (ไม่ใช่ผลสอบจริง)</p>'+
  '<div class="lb-controls"><label for="lb-pack">เลือกชุดข้อสอบ:</label><select id="lb-pack" class="lb-select">'+packOptions()+'</select>'+
  '<button type="button" class="btn secondary sm" id="lb-refresh">🔄 อัปเดตอันดับ</button></div>'+
@@ -51,10 +51,16 @@ function resultMarkup(){
  '<div class="lb-tip">ชื่อเล่นไม่เกิน 24 ตัวอักษร • ห้ามกรอกชื่อ-นามสกุลจริง เบอร์โทร หรือข้อมูลส่วนตัว</div>'+
  '<button class="btn" id="lb-save" type="button">🌟 ยืนยันบันทึกลง Leaderboard</button></div>'+
  '<div id="lb-save-status" class="lb-msg" role="status"></div></div>'+
- '<div class="lb-controls"><strong>อันดับของชุดนี้</strong><button type="button" class="btn secondary sm" id="lb-result-refresh">🔄 ดูอันดับล่าสุด</button></div>'+
+ '<div class="lb-controls"><h2 id="lb-result-board" class="lb-board-title" tabindex="-1">อันดับของชุดนี้</h2><button type="button" class="btn secondary sm" id="lb-result-refresh">🔄 ดูอันดับล่าสุด</button></div>'+
  '<div id="lb-result-status" role="status" class="lb-muted"></div><div class="lb-wrap" id="lb-result-rows"></div></div>';
 }
 function status(el,message){var node=document.getElementById(el);if(node)node.textContent=message||''}
+function jumpToBoard(id){
+ var heading=document.getElementById(id);
+ if(!heading)return;
+ heading.focus({preventScroll:true});
+ heading.scrollIntoView({block:'start',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+}
 function formatRanks(rows){
  if(!rows||!rows.length)return '<p class="lb-muted">ยังไม่มีใครบันทึกคะแนนในชุดนี้ มาเป็นคนแรกกันเถอะ! ✨</p>';
  var html='<table class="lb-table"><thead><tr><th>อันดับ</th><th>ชื่อเล่น</th><th>คะแนน</th><th>วันที่</th></tr></thead><tbody>';
@@ -110,6 +116,7 @@ async function sendScore(){
   status('lb-save-status','✅ บันทึกแล้ว! ชื่อที่แสดง: '+(data.display_name||name)+' • คะแนนครั้งนี้ '+data.score+'/'+data.total+
     ' • คะแนนดีที่สุด '+data.best_score+'/'+data.total);
   button.textContent='✅ บันทึกเรียบร้อย';
+  document.getElementById('lb-saved-view').classList.remove('hidden');
   document.getElementById('lb-name').disabled=true;
   box.disabled=true;
   updateBoard(currentAttempt.packId,'lb-result-rows','lb-result-status');
@@ -123,6 +130,8 @@ function renderResultLeaderboard(){
  var visible=currentAttempt.packId!=='retry';
  var el=document.getElementById('leaderboard-result');if(!el)return;
  el.style.display=visible?'':'none';
+ document.getElementById('lb-result-view').classList.toggle('hidden',!visible);
+ document.getElementById('lb-saved-view').classList.add('hidden');
  if(!visible)return;
  document.getElementById('lb-consent').checked=false;
  document.getElementById('lb-consent').disabled=false;
@@ -173,6 +182,15 @@ function init(){
  if(earlier)earlier.insertAdjacentHTML('beforebegin',boardMarkup());
  else home.insertAdjacentHTML('beforeend',boardMarkup());
  result.querySelector('.report').insertAdjacentHTML('afterend',resultMarkup());
+ home.querySelector('.intro').insertAdjacentHTML('beforeend',
+  '<div class="buttons lb-shortcuts"><button type="button" class="btn secondary" id="lb-home-view" aria-controls="leaderboard-home">🏆 ดู Leaderboard</button></div>');
+ result.querySelector('.report').insertAdjacentHTML('afterend',
+  '<div class="buttons lb-shortcuts"><button type="button" class="btn secondary" id="lb-result-view" aria-controls="lb-result-board">🏆 ดูอันดับของชุดนี้</button></div>');
+ document.querySelector('#leaderboard-result .lb-controls').insertAdjacentHTML('beforebegin',
+  '<div class="buttons lb-shortcuts"><button type="button" class="btn secondary sm hidden" id="lb-saved-view" aria-controls="lb-result-board">🏆 บันทึกแล้ว · ดูอันดับของชุดนี้</button></div>');
+ document.getElementById('lb-home-view').addEventListener('click',function(){jumpToBoard('lb-home-board')});
+ document.getElementById('lb-result-view').addEventListener('click',function(){jumpToBoard('lb-result-board')});
+ document.getElementById('lb-saved-view').addEventListener('click',function(){jumpToBoard('lb-result-board')});
  var select=document.getElementById('lb-pack');
  select.value='fullmock';
  select.addEventListener('change',function(){updateBoard(this.value,'lb-results','lb-status')});
