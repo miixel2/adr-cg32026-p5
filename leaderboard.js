@@ -4,8 +4,28 @@
 var currentAttempt=null;
 var busy=false;
 var boardToken=0;
+var NICKNAME_STORAGE_KEY='mgp_p5_leaderboard_nickname';
 var NICK_ADJ=['ดาว','เมฆ','รุ้ง','ฟ้า','แสง','เก่ง','ใจดี','จิ๋ว','ฮีโร่','นักสืบ'];
 var NICK_NOUN=['น้อย','สายฟ้า','ตัวจิ๋ว','แสนสนุก','นักสำรวจ','หรรษา','อัจฉริยะ','ยิ้มแฉ่ง'];
+/* Nickname preference stays on this device; consent to upload scores is separate. */
+function isValidNickname(name){
+ return name.length<=24 && !/[<>&"'\/\\]/.test(name) && !/\d{8,}/.test(name);
+}
+function getSavedNickname(){
+ try{
+  var name=(localStorage.getItem(NICKNAME_STORAGE_KEY)||'').trim();
+  return isValidNickname(name)?name:'';
+ }catch(e){return ''}
+}
+function saveNicknamePreference(value){
+ var name=String(value||'').trim();
+ if(!isValidNickname(name))return false;
+ try{
+  if(name)localStorage.setItem(NICKNAME_STORAGE_KEY,name);
+  else localStorage.removeItem(NICKNAME_STORAGE_KEY);
+  return true;
+ }catch(e){return false}
+}
 function ready(){return window.QuizBackend.isConfigured()}
 function getClient(){return window.QuizBackend.getClient()}
 function randomName(){
@@ -31,7 +51,7 @@ function resultMarkup(){
  '<div class="lb-opt"><label class="lb-check"><input type="checkbox" id="lb-consent"> <span>ฉันต้องการบันทึกคะแนนและชื่อเล่นเพื่อแสดงใน Leaderboard</span></label>'+
  '<div id="lb-details" class="lb-details"><label for="lb-name">ชื่อเล่นสำหรับแสดงอันดับ (เว้นว่างได้)</label>'+
  '<input class="lb-input" id="lb-name" maxlength="24" autocomplete="off" placeholder="เว้นว่าง = สุ่มชื่อสุดน่ารักให้อัตโนมัติ">'+
- '<div class="lb-tip">ชื่อเล่นไม่เกิน 24 ตัวอักษร • ห้ามกรอกชื่อ-นามสกุลจริง เบอร์โทร หรือข้อมูลส่วนตัว</div>'+
+ '<div class="lb-tip">ชื่อเล่นไม่เกิน 24 ตัวอักษร • ไม่ใช้ชื่อจริง เบอร์โทร หรือข้อมูลส่วนตัว • จำชื่อเล่นในเครื่องนี้เพื่อกรอกครั้งถัดไป แก้ไขหรือลบชื่อได้ทุกเมื่อ</div>'+
  '<button class="btn" id="lb-save" type="button">🌟 ยืนยันบันทึกลง Leaderboard</button></div>'+
  '<div id="lb-save-status" class="lb-msg" role="status"></div></div>'+
  '<div class="lb-controls"><h2 id="lb-result-board" class="lb-board-title" tabindex="-1">อันดับของชุดนี้</h2><button type="button" class="btn secondary sm" id="lb-result-refresh">🔄 ดูอันดับล่าสุด</button></div>'+
@@ -132,6 +152,7 @@ async function sendScore(){
   var data=r.data||{};
   status('lb-save-status','✅ บันทึกแล้ว! ชื่อที่แสดง: '+(data.display_name||name)+' • คะแนนครั้งนี้ '+data.score+'/'+data.total+
     ' • คะแนนดีที่สุด '+data.best_score+'/'+data.total);
+  saveNicknamePreference(raw);
   button.textContent='✅ บันทึกเรียบร้อย';
   document.getElementById('lb-saved-view').classList.remove('hidden');
   document.getElementById('lb-name').disabled=true;
@@ -152,7 +173,7 @@ function renderResultLeaderboard(){
  if(!visible)return;
  document.getElementById('lb-consent').checked=false;
  document.getElementById('lb-consent').disabled=false;
- document.getElementById('lb-name').value='';
+ document.getElementById('lb-name').value=getSavedNickname();
  document.getElementById('lb-name').disabled=false;
  document.getElementById('lb-save').disabled=false;
  document.getElementById('lb-save').textContent='🌟 ยืนยันบันทึกลง Leaderboard';
@@ -215,6 +236,9 @@ function init(){
  document.getElementById('lb-consent').addEventListener('change',function(){
    document.getElementById('lb-details').classList.toggle('is-open',this.checked);
    status('lb-save-status',this.checked?'กรอกชื่อเล่นหรือเว้นว่าง แล้วกดยืนยันเพื่อบันทึก':'จะไม่บันทึกคะแนนออนไลน์ หากไม่เลือกยินยอม');
+ });
+ document.getElementById('lb-name').addEventListener('change',function(){
+   saveNicknamePreference(this.value);
  });
  document.getElementById('lb-save').addEventListener('click',sendScore);
  document.getElementById('lb-result-refresh').addEventListener('click',function(){if(currentAttempt)updateBoard(currentAttempt.packId,'lb-result-rows','lb-result-status')});
